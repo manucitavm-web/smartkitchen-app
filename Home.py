@@ -21,7 +21,7 @@ Una cocina inteligente multimodal que permite:
 
 # Carga de la imagen directamente desde la raíz del repositorio
 try:
-    img = Image.open("kitchen.jpeg")  # Modificado para buscar en la raíz
+    img = Image.open("cocina.jpg")  # Modificado para buscar en la raíz
     st.image(img, caption="Centro de Control Integrado", use_container_width=True)
 except FileNotFoundError:
     # Imagen de respaldo automática si aún no has subido tu archivo 'kitchen.jpeg'
