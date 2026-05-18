@@ -2,3 +2,4 @@ streamlit
 streamlit-mic-recorder
 paho-mqtt
 Pillow
+SpeechRecognition
