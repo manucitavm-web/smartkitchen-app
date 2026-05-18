@@ -1,58 +1,28 @@
 import streamlit as st
-from streamlit_mic_recorder import mic_recorder
 import time
 import random
 
-st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
+st.set_page_config(page_title="Asistente de Cocina", page_icon="🍳", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Cocina Inteligente")
-st.write("Dicta o escribe los ingredientes de tu nevera para diseñar una receta instantánea.")
+st.markdown("# 🍳 Asistente de Cocina Inteligente")
+st.write("Escribe libremente los ingredientes de tu nevera para diseñar una receta instantánea.")
 st.write("---")
 
 # Inicializar el historial del chat en la memoria de la aplicación
 if "chat_廚房" not in st.session_state:
     st.session_state["chat_廚房"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy y te armarme una receta a la medida de inmediato."}
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy (puedes separarlos por espacios o comas) y te armaré una receta a la medida de inmediato."}
     ]
-
-# Inicializar una variable para guardar el texto que se va a transcribir
-if "texto_de_voz" not in st.session_state:
-    st.session_state["texto_de_voz"] = ""
 
 col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("🎙️ ¿Qué tienes a la mano?")
+    st.subheader("🛒 ¿Qué tienes a la mano?")
     
-    # Grabador interactivo configurado para interactuar con el estado de la app
-    audio = mic_recorder(
-        start_prompt="🎙️ Grabar ingredientes",
-        stop_prompt="🛑 Detener grabación",
-        just_once=True,
-        key="mic_asistente"
-    )
-    
-    # Si la persona usó el micrófono, el sistema procesa los bytes en texto inmediatamente
-    if audio:
-        st.audio(audio['bytes'], format='audio/wav')
-        
-        # Procesamiento automático del búfer de audio del navegador
-        with st.spinner("Transcribiendo tu voz a texto..."):
-            time.sleep(1.2)  # Tiempo de respuesta adaptativo de la interfaz
-            
-            # NOTA DE DISEÑO: Para evitar el error de códec PCM WAV de los navegadores, 
-            # el sistema extrae los metadatos del audio de forma limpia. 
-            # Aquí se asigna la transcripción automática detectada:
-            st.session_state["texto_de_voz"] = "Pollo papas cebolla"
-            st.toast("¡Audio transcrito con éxito!", icon="🎤")
-
-    st.write("---")
-
-    # La casilla de entrada de texto ahora recibe AUTOMÁTICAMENTE el valor de la voz
+    # Entrada libre y directa de texto
     ingredientes = st.text_input(
         "Lista de Ingredientes:", 
-        value=st.session_state["texto_de_voz"],
-        placeholder="Escribe los ingredientes...",
+        placeholder="Ej: carne tomate arroz plátano",
         key="input_ingredientes"
     )
 
@@ -62,9 +32,9 @@ with col1:
             st.session_state["chat_廚房"].append({"role": "user", "content": f"Tengo: {ingredientes}"})
             
             with st.spinner("Nuestro chef digital está combinando tus ingredientes..."):
-                time.sleep(1.5)  # Simula un tiempo de procesamiento fluido
+                time.sleep(1.2)  # Simula un tiempo de procesamiento fluido
                 
-                # Procesamos el texto eliminando comas o espacios para que sea libre de verdad
+                # Procesamos el texto eliminando comas o espacios para mapear los ingredientes
                 texto_limpio = ingredientes.replace(",", " ")
                 lista_ingredientes = [i.strip().capitalize() for i in texto_limpio.split(" ") if i.strip() and len(i.strip()) > 1]
                 
@@ -80,9 +50,7 @@ with col1:
                 
                 ingredientes_formateados = "\n".join([f"* **{ing}** (Detectado desde tu entrada)." for ing in lista_ingredientes])
                 
-                pasos_dinamicos = ""
-                if len(lista_ingredientes) >= 1:
-                    pasos_dinamicos += f"1.  **Preparación base:** Toma el ingrediente principal (**{lista_ingredientes[0]}**), pícalo en trozos cómodos y dóralo en una sartén con un chorrito de aceite, sal y pimienta.\n"
+                pasos_dinamicos = f"1.  **Preparación base:** Toma el ingrediente principal (**{lista_ingredientes[0]}**), pícalo en trozos cómodos y dóralo en una sartén con un chorrito de aceite, sal y pimienta.\n"
                 if len(lista_ingredientes) >= 2:
                     pasos_dinamicos += f"2.  **Integración:** Incorpora el segundo ingrediente (**{lista_ingredientes[1]}**) finamente picado para armar una base aromática llena de sabor.\n"
                 if len(lista_ingredientes) >= 3:
@@ -107,17 +75,16 @@ with col1:
 ---
 💡 **Consejo de Diseño UX:** Recuerda que si este plato genera vapores o humos intensos, puedes ir a la pestaña **Alertas y Tiempos** para encender el extractor remoto en Wokwi.
 """
-                # Guardar respuesta en el historial y limpiar la caja de voz para la próxima
+                # Guardar respuesta en el historial
                 st.session_state["chat_廚房"].append({"role": "assistant", "content": respuesta_chef})
-                st.session_state["texto_de_voz"] = ""
                 st.rerun()
         else:
-            st.warning("Escribe o dicta al menos un ingrediente para poder ayudarte.")
+            st.warning("Escribe al menos un ingrediente para poder ayudarte.")
 
 with col2:
     st.subheader("💬 Menú y Sugerencias del Asistente")
     
-    # Renderizar el historial completo
+    # Renderizar el historial completo estilo chat
     for msg in st.session_state["chat_廚房"]:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
@@ -125,9 +92,8 @@ with col2:
     # Botón para limpiar pantalla
     if len(st.session_state["chat_廚房"]) > 1:
         st.write("---")
-        if st.button("🧹 Limpiar historial de recetas"):
+        if st.button("🧹 Limpiar historial de recetas", use_container_width=True):
             st.session_state["chat_廚房"] = [
                 {"role": "assistant", "content": "¡Listo! Todo despejado. ¿Qué otros ingredientes tienes para probar hoy?"}
             ]
-            st.session_state["texto_de_voz"] = ""
             st.rerun()
