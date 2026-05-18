@@ -13,7 +13,6 @@ with col1:
     st.subheader("Captura de Audio Colectiva")
     st.write("Haz clic en iniciar, habla y detén la grabación:")
     
-    # Grabador real de tu requerimiento streamlit-mic-recorder
     audio = mic_recorder(
         start_prompt="🎙️ Iniciar Grabación",
         stop_prompt="🛑 Detener",
