@@ -10,7 +10,7 @@ st.write("---")
 
 # 🔐 CONFIGURACIÓN DE LA IA (Pega aquí tu clave de Google AI Studio)
 # Nota: Para producción es mejor usar st.secrets, pero para tu entrega puedes ponerla directo aquí:
-API_KEY = "TU_API_KEY_AQUÍ" 
+API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q" 
 
 if API_KEY != "TU_API_KEY_AQUÍ":
     genai.configure(api_key=API_KEY)
