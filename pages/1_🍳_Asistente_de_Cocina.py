@@ -8,17 +8,17 @@ st.write("Escribe libremente los ingredientes que tienes en tu nevera y nuestra 
 st.write("---")
 
 # 🔐 CLAVE API DE GOOGLE AI STUDIO
-# Pega aquí tu clave larga que empieza con "AIzaSy..." para activar la IA real
-API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
+API_KEY = "TU_API_KEY_AQUÍ"
 
 if API_KEY != "TU_API_KEY_AQUÍ":
     try:
         genai.configure(api_key=API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # CORRECCIÓN DE ERROR 404: Se usa el nombre de modelo calificado completo
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
     except Exception as e:
         st.error(f"Error al conectar con la IA de Google: {e}")
 else:
-    st.warning("⚠️ Recuerda pegar tu API Key de Google AI Studio en la línea 12 para activar el cerebro de la IA.")
+    st.warning("⚠️ Recuerda pegar tu API Key de Google AI Studio en la línea 11 para activar el cerebro de la IA.")
 
 # Inicializar el historial del chat en la memoria si no existe
 if "chat_conversacional_real" not in st.session_state:
@@ -31,7 +31,7 @@ col1, col2 = st.columns([1, 1.8], gap="large")
 with col1:
     st.subheader("🛒 ¿Qué tienes en tu nevera?")
     
-    # Caja de texto libre para que el usuario escriba lo que quiera
+    # Caja de texto libre para el usuario
     ingredientes = st.text_input(
         "Ingresa tus ingredientes:", 
         placeholder="Ej: huevos, pan, leche, queso",
@@ -46,7 +46,7 @@ with col1:
             if API_KEY != "TU_API_KEY_AQUÍ":
                 with st.spinner("El Chef de IA está analizando tus ingredientes..."):
                     try:
-                        # Le damos un rol (prompt) a la IA para que redacte de forma espectacular y coherente
+                        # Prompt estructurado para guiar el comportamiento de la IA
                         prompt_chef = (
                             f"Actúa como un chef profesional y creativo. El usuario te da estos ingredientes: '{ingredientes}'. "
                             f"Crea una receta real, lógica y deliciosa que tenga sentido estricto con lo que te acaban de dar. "
@@ -65,7 +65,7 @@ with col1:
                     except Exception as e:
                         st.error(f"Hubo un problema con la API de Google: {e}")
             else:
-                st.error("No puedo generar la receta porque falta tu API Key en la línea 12.")
+                st.error("No puedo generar la receta porque falta tu API Key en la línea 11.")
         else:
             st.warning("Escribe al menos un ingrediente para poder ayudarte.")
 
