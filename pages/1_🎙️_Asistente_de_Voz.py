@@ -4,61 +4,67 @@ import time
 
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Voz & Co-Creación")
-st.write("Dita los ingredientes que tienes en tu nevera y el asistente te propondrá una receta.")
+st.markdown("# 🎙️ Asistente de Cocina Conversacional")
+st.write("Habla libremente con la IA. Dicta los ingredientes que tengas a la mano para recibir ideas personalizadas.")
 st.write("---")
 
-col1, col2 = st.columns([1, 1.5], gap="large")
+# Inicializar el historial de conversación en la memoria de la app si no existe
+if "historial_chat" not in st.session_state:
+    st.session_state["historial_chat"] = [
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy y te diseñaré una receta a la medida."}
+    ]
+
+col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("¿Qué tienes en la nevera?")
-    st.write("Presiona el botón y menciona de 3 a 4 ingredientes:")
+    st.subheader("🎙️ Entrada de Voz")
+    st.write("Presiona el botón, menciona tus ingredientes en voz alta y detén la grabación:")
     
-    audio = mic_recorder(
-        start_prompt="🎙️ Dictar Ingredientes",
-        stop_prompt="🛑 Terminar Lista",
+    # Grabador de audio nativo de tus requerimientos
+    audio_registro = mic_recorder(
+        start_prompt="🎙️ Hablar con la IA",
+        stop_prompt="🛑 Enviar Mensaje",
         just_once=False,
-        key="mic_cocina"
+        key="chat_mic"
     )
 
-    # Simulación de procesamiento de la intención del usuario
-    if audio:
-        st.audio(audio['bytes'], format='audio/wav')
+    if audio_registro:
+        st.audio(audio_registro['bytes'], format='audio/wav')
         
-        with st.spinner("Procesando ingredientes con IA..."):
-            time.sleep(2.5) # Simula el tiempo de respuesta de la API
+        with st.spinner("Transcribiendo y pensando..."):
+            time.sleep(2) # Simulación del procesamiento de lenguaje natural
             
-        st.success("¡Ingredientes detectados con éxito!")
+            # --- SIMULACIÓN DE DETECCIÓN LINGÜÍSTICA DINÁMICA ---
+            # Aquí simulamos que la IA extrae el texto del audio y responde de manera fluida
+            # En un entorno de producción, aquí conectarías la API de Gemini o OpenAI
+            consulta_usuario = "Tengo papas, carne de res, cebolla y un tomate."
+            respuesta_ia = (
+                "¡Excelente combinación! Con esos ingredientes podemos preparar un **Lomo Saltado Exprés** o un **Estofado Rústico**. "
+                "Aquí tienes la propuesta:\n\n"
+                "**Paso 1:** Corta la carne en tiras y séllala a fuego alto en una sartén con aceite.\n"
+                "**Paso 2:** Retira la carne y en la misma sartén sofríe la cebolla y el tomate en gajos.\n"
+                "**Paso 3:** Mezcla todo, añade las papas (puedes hacerlas cocidas o fritas) y sazona con sal y pimienta. "
+                "¡Quedará delicioso!"
+            )
+            # ────────────────────────────────────────────────────
         
-        # Guardamos en el estado que encontramos ingredientes simulados
-        st.session_state["ingredientes_listos"] = True
-    else:
-        if "ingredientes_listos" not in st.session_state:
-            st.session_state["ingredientes_listos"] = False
+        # Guardar la interacción en el historial para que se renderice en el chat
+        st.session_state["historial_chat"].append({"role": "user", "content": f"🎤 *[Audio enviado]* -> \"{consulta_usuario}\""})
+        st.session_state["historial_chat"].append({"role": "assistant", "content": respuesta_ia})
 
 with col2:
-    st.subheader("💡 Receta Sugerida")
+    st.subheader("💬 Historial de la Conversación")
     
-    if st.session_state["ingredientes_listos"]:
-        st.markdown("### 👨‍🍳 Pollo Cremoso al Tomate Estilo SmartKitchen")
-        st.caption("Receta generada en base a: *Pollo, Tomate, Cebolla y Crema de leche*")
-        
-        tab1, tab2 = st.tabs(["🛒 Lista Ajustada", "📝 Preparación"])
-        
-        with tab1:
-            st.markdown("""
-            * **Tus ingredientes:** Pollo (pechuga en cubos), Tomates maduros, Cebolla picada, Crema de leche.
-            * **Básicos de despensa necesarios:** Aceite de oliva, sal, pimienta y un toque de ajo.
-            """)
-            
-        with tab2:
-            st.markdown("""
-            1.  **Sofreír:** En una sartén con aceite de oliva, dora la cebolla picada y un toque de ajo hasta que estén transparentes.
-            2.  **Dorar la proteína:** Sella los cubos de pollo sazonados con sal y pimienta hasta que cambien de color.
-            3.  **Crear la salsa:** Agrega los tomates licuados o picados finamente y deja reducir a fuego medio por 5 minutos.
-            4.  **Textura:** Baja el fuego al mínimo, vierte la crema de leche, revuelve bien y cocina por 3 minutos más hasta lograr una consistencia cremosa. ¡Sirve caliente!
-            """)
-            
-        st.info("💡 **Tip del asistente:** Puedes enviarle una señal a tu Wokwi para prender el extractor si notas que el sofrito genera mucho humo.")
-    else:
-        st.info("Usa el micrófono de la izquierda para listar tus alimentos y ver la magia.")
+    # Renderizar el chat de manera estética usando el formato nativo de Streamlit
+    for mensaje in st.session_state["historial_chat"]:
+        with st.chat_message(mensaje["role"]):
+            st.write(mensaje["content"])
+
+    # Botón auxiliar para reiniciar la nevera/conversación
+    if len(st.session_state["historial_chat"]) > 1:
+        st.write("---")
+        if st.button("🧹 Limpiar conversación y empezar de nuevo"):
+            st.session_state["historial_chat"] = [
+                {"role": "assistant", "content": "¡Hola de nuevo! ¿Qué otros ingredientes encontraste en la cocina?"}
+            ]
+            st.rerun()
