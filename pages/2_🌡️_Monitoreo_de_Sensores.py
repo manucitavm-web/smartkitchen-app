@@ -8,7 +8,6 @@ st.markdown("# 🌡️ Monitoreo de Sensores (Wokwi)")
 st.write("Visualiza las variables capturadas por tu circuito virtual en tiempo real.")
 st.write("---")
 
-# Servidor intermedio en internet para conectar con Wokwi
 BROKER = "broker.hivemq.com"
 PORT = 1883
 TOPIC = "smartkitchen/telemetria"
@@ -18,11 +17,9 @@ if "temperatura" not in st.session_state:
 if "humedad" not in st.session_state:
     st.session_state["humedad"] = "Esperando..."
 
-# Función que se ejecuta cuando llega un dato desde Wokwi
 def mensaje_recibido(client, userdata, msg):
     payload = msg.payload.decode("utf-8")
     try:
-        # Si Wokwi manda "24,60", lo separamos
         datos = payload.split(",")
         st.session_state["temperatura"] = f"{datos[0]} °C"
         st.session_state["humedad"] = f"{datos[1]} %"
@@ -43,7 +40,7 @@ if st.button("🔄 Actualizar Lecturas de Wokwi", type="primary", use_container_
             cliente.connect(BROKER, PORT, 60)
             cliente.subscribe(TOPIC)
             cliente.loop_start()
-            time.sleep(2)  # Ventana de tiempo para capturar el dato
+            time.sleep(2)
             cliente.loop_stop()
             cliente.disconnect()
             st.toast("Datos sincronizados de la nube.", icon="📡")
