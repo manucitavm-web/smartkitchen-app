@@ -8,7 +8,7 @@ st.write("Escribe libremente los ingredientes que tienes en tu nevera y nuestro 
 st.write("---")
 
 # 🔐 CONFIGURACIÓN DE LA IA (Pega aquí tu clave larga de Google AI Studio que empieza con AIzaSy)
-API_KEY = "TU_API_KEY_AQUÍ"
+API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
 
 if API_KEY != "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q":
     try:
