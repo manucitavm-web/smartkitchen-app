@@ -19,12 +19,12 @@ Una cocina inteligente multimodal que permite:
 - 🖼️ Procesamiento de imágenes con Pillow
 """)
 
-# Carga de imagen usando la librería Pillow de tus requerimientos
+# Carga de la imagen directamente desde la raíz del repositorio
 try:
-    img = Image.open("assets/kitchen.jpeg")
+    img = Image.open("kitchen.jpeg")  # Modificado para buscar en la raíz
     st.image(img, caption="Centro de Control Integrado", use_container_width=True)
 except FileNotFoundError:
-    # Imagen de respaldo de internet por si aún no subes el archivo local
+    # Imagen de respaldo automática si aún no has subido tu archivo 'kitchen.jpeg'
     st.image("https://images.unsplash.com/photo-1556911220-e15b29be8c8f", caption="Ecosistema SmartKitchen conectado", use_container_width=True)
 
 st.info("Usa el menú lateral para navegar entre páginas.")
