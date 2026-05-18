@@ -11,7 +11,7 @@ st.write("---")
 # Inicializar el historial del chat en la memoria de la aplicación
 if "chat_廚房" not in st.session_state:
     st.session_state["chat_廚房"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy (puedes separarlos por espacios o comas) y te armaré una receta a la medida de inmediato."}
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy y te armaré una receta a la medida de inmediato."}
     ]
 
 col1, col2 = st.columns([1, 1.8], gap="large")
