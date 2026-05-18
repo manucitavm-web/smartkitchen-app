@@ -6,7 +6,7 @@ import random
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
 st.markdown("# 🎙️ Asistente de Cocina Inteligente")
-st.write("Dicta o escribe libremente los ingredientes de tu nevera para diseñar una receta instantánea.")
+st.write("Dicta o escribe los ingredientes de tu nevera para diseñar una receta instantánea.")
 st.write("---")
 
 # Inicializar el historial del chat en la memoria de la aplicación
@@ -52,7 +52,7 @@ with col1:
     ingredientes = st.text_input(
         "Ingredientes listos (puedes editarlos o escribir directamente de corrido):", 
         value=st.session_state["texto_de_voz"],
-        placeholder="Ej: carne tomate arroz plátano",
+        placeholder="Escribe los ingredientes...",
         key="input_ingredientes"
     )
 
