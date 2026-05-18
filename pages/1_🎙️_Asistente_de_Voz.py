@@ -14,7 +14,7 @@ API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
 
 if API_KEY != "TU_API_KEY_AQUÍ":
     genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
 else:
     st.warning("⚠️ Recuerda poner tu API Key de Google AI Studio en el código para que la IA responda.")
 
