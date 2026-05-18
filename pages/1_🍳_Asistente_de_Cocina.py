@@ -7,18 +7,18 @@ st.markdown("# 🍳 Asistente de Cocina con IA Real")
 st.write("Escribe libremente los ingredientes que tienes en tu nevera y nuestra IA creará una receta real y coherente en segundos.")
 st.write("---")
 
-# 🔐 CLAVE API DE GOOGLE AI STUDIO
+# 🔐 CLAVE API DE GOOGLE AI STUDIO (Integrada con éxito)
 API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
 
 if API_KEY != "TU_API_KEY_AQUÍ":
     try:
         genai.configure(api_key=API_KEY)
-        # CORRECCIÓN DE ERROR 404: Se usa el nombre de modelo calificado completo
+        # Nombre de modelo calificado completo para evitar error 404
         model = genai.GenerativeModel('models/gemini-1.5-flash')
     except Exception as e:
         st.error(f"Error al conectar con la IA de Google: {e}")
 else:
-    st.warning("⚠️ Recuerda pegar tu API Key de Google AI Studio en la línea 11 para activar el cerebro de la IA.")
+    st.warning("⚠️ Recuerda pegar tu API Key de Google AI Studio para activar el cerebro de la IA.")
 
 # Inicializar el historial del chat en la memoria si no existe
 if "chat_conversacional_real" not in st.session_state:
@@ -65,7 +65,7 @@ with col1:
                     except Exception as e:
                         st.error(f"Hubo un problema con la API de Google: {e}")
             else:
-                st.error("No puedo generar la receta porque falta tu API Key en la línea 11.")
+                st.error("No puedo generar la receta porque falta tu API Key en el sistema.")
         else:
             st.warning("Escribe al menos un ingrediente para poder ayudarte.")
 
