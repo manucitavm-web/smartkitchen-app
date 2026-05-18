@@ -50,7 +50,7 @@ with col1:
 
     # La casilla de entrada de texto ahora recibe AUTOMÁTICAMENTE el valor de la voz
     ingredientes = st.text_input(
-        "Ingredientes listos (puedes editarlos o escribir directamente de corrido):", 
+        "Lista de Ingredientes:", 
         value=st.session_state["texto_de_voz"],
         placeholder="Escribe los ingredientes...",
         key="input_ingredientes"
