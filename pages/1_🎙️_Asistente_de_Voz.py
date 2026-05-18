@@ -10,7 +10,7 @@ st.write("Graba tu voz diciendo los ingredientes que tienes y la IA los transcri
 st.write("---")
 
 # 🔐 CLAVE API DE GOOGLE AI STUDIO (Pega tu clave aquí adentro)
-API_KEY = "TU_API_KEY_AQUÍ"
+API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
 
 if API_KEY != "TU_API_KEY_AQUÍ":
     genai.configure(api_key=API_KEY)
