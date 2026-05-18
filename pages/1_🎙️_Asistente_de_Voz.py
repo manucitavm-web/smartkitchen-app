@@ -12,7 +12,7 @@ st.write("---")
 # Inicializar el historial del chat en la memoria de la aplicación
 if "chat_廚房" not in st.session_state:
     st.session_state["chat_廚房"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy (ej: *'pollo, papas, cebolla'*) y te armarme una receta a la medida de inmediato."}
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy y te armarme una receta a la medida de inmediato."}
     ]
 
 # Inicializar una variable para guardar el texto que se va a transcribir
