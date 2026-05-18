@@ -1,130 +1,90 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-import speech_recognition as sr
-import io
+import google.generativeai as genai
 import time
-import random
 
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Cocina por Voz Dinámico")
-st.write("Graba tus ingredientes. El sistema los transcribirá en tiempo real y creará una receta única con lo que dijiste.")
+st.markdown("# 🎙️ Asistente de Cocina por Voz Inteligente")
+st.write("Graba tu voz diciendo los ingredientes que tienes y la IA los transcribirá para crear tu receta.")
 st.write("---")
 
-# Inicializar el historial del chat en la memoria de la aplicación
-if "chat_dinamico_real" not in st.session_state:
-    st.session_state["chat_dinamico_real"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu chef SmartKitchen. Presiona el botón, dime qué ingredientes tienes (sin importar cuáles sean) y yo los transcribiré para armar tu plato."}
+# 🔐 CLAVE API DE GOOGLE AI STUDIO (Pega tu clave aquí adentro)
+API_KEY = "TU_API_KEY_AQUÍ"
+
+if API_KEY != "TU_API_KEY_AQUÍ":
+    genai.configure(api_key=API_KEY)
+    # Usamos el modelo más actualizado y estable
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    st.warning("⚠️ Recuerda pegar tu API Key en la línea 13 del código para activar la Inteligencia Artificial.")
+
+# Inicializar el historial del chat
+if "chat_conversacional_real" not in st.session_state:
+    st.session_state["chat_conversacional_real"] = [
+        {"role": "assistant", "content": "¡Hola! Soy tu chef SmartKitchen. Presiona el botón de abajo, menciona de corrido los ingredientes de tu nevera y yo me encargo de escucharte y diseñar tu menú."}
     ]
 
 col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("🎙️ Captura de Voz Directa")
-    st.write("Haz clic en hablar, menciona tus alimentos de corrido y detén la grabación:")
+    st.subheader("🎙️ Grabadora de Ingredientes")
+    st.write("Haz clic, habla libremente y detén la grabación:")
     
-    # Configuramos el grabador nativo
-    audio = mic_recorder(
-        start_prompt="🎙️ Empezar a dictar",
-        stop_prompt="🛑 Detener y Transcribir",
+    # Capturamos el audio nativo desde el navegador
+    audio_datos = mic_recorder(
+        start_prompt="🎙️ Empezar a hablar",
+        stop_prompt="🛑 Detener y Enviar",
         just_once=True,
-        key="mic_transcriptor_dinamico"
+        key="mic_multimodal_real"
     )
     
-    texto_transcrito = ""
-
-    # Si la persona graba un audio, se activa el proceso de conversión real
-    if audio:
-        st.audio(audio['bytes'], format='audio/wav')
+    if audio_datos:
+        # Mostramos el reproductor para que el usuario verifique su grabación
+        st.audio(audio_datos['bytes'], format='audio/wav')
         
-        with st.spinner("Transformando tu voz en texto..."):
-            try:
-                # Leemos los bytes que grabaste directamente desde la memoria
-                archivo_audio = io.BytesIO(audio['bytes'])
-                reconocedor = sr.Recognizer()
-                
-                with sr.AudioFile(archivo_audio) as fuente:
-                    # Ajuste de ruido para que te escuche bien en cualquier entorno
-                    reconocedor.adjust_for_ambient_noise(fuente, duration=0.5)
-                    datos_audio = reconocedor.record(fuente)
+        if API_KEY != "TU_API_KEY_AQUÍ":
+            with st.spinner("Gemini está escuchando tu audio y transcribiendo..."):
+                try:
+                    # Pasamos los bytes del audio directamente a la API de Google en el formato nativo
+                    audio_mime = audio_datos.get('sample_mime_type', 'audio/wav')
+                    input_audio = {
+                        "mime_type": audio_mime,
+                        "data": audio_datos['bytes']
+                    }
                     
-                    # Llamada al motor de reconocimiento libre en español latino
-                    texto_transcrito = reconocedor.recognize_google(datos_audio, language="es-CO")
-                    st.success(f"🗣️ Transcripción exitosa: *\"{texto_transcrito}\"*")
-            
-            except sr.UnknownValueError:
-                st.error("🎙️ El audio se recibió, pero no logré identificar las palabras. Intenta hablar más claro o pausado.")
-            except sr.RequestError:
-                st.warning("📡 Servicio de transcripción temporalmente saturado. Puedes escribir en la casilla de abajo.")
-            except Exception as e:
-                st.error(f"Aviso del sistema: {e}")
-
-    st.write("---")
-    
-    # El cuadro de texto ahora se llena AUTOMÁTICAMENTE con lo que transcribió el micrófono
-    ingredientes_finales = st.text_input(
-        "Ingredientes listos para el Chef:", 
-        value=texto_transcrito,
-        placeholder="Tus palabras aparecerán aquí al hablar"
-    )
-
-    if st.button("✨ Generar Receta con lo que Dije", type="primary", use_container_width=True):
-        if ingredientes_finales:
-            # Guardamos lo que el usuario dijo en el historial del chat
-            st.session_state["chat_dinamico_real"].append({"role": "user", "content": f"Ingredientes dictados: {ingredientes_finales}"})
-            
-            with st.spinner("El chef está cocinando tu idea..."):
-                time.sleep(1.2)
-                
-                # Procesamos las palabras reales que dijiste (separa por espacios)
-                palabras = [p.strip().capitalize() for p in ingredientes_finales.replace(",", " ").split(" ") if p.strip()]
-                
-                # Si por alguna razón la lista queda vacía, ponemos un genérico seguro
-                if len(palabras) == 0:
-                    palabras = ["Mis ingredientes personalizados"]
-                
-                # Selección aleatoria de técnicas para que la receta varíe de forma divertida
-                tecnicas = ["un salteado al wok", "un guiso casero reconfortante", "una preparación express a la sartén", "un tazón gourmet"]
-                tecnica_elegida = random.choice(tecnicas)
-                
-                titulo_plato = f"👨‍🍳 {palabras[0]} al Estilo SmartKitchen"
-                ingredientes_lista = "\n".join([f"* **{item}** (Detectado desde tu audio)" for item in palabras])
-                
-                # Armamos las instrucciones dinámicamente usando TUS palabras reales
-                pasos = f"1.  **Alistar la base:** Toma tu primer ingrediente dictado (**{palabras[0]}**), córtalo en porciones medianas y sella en una sartén con aceite caliente.\n"
-                if len(palabras) >= 2:
-                    pasos += f"2.  **Saborizar:** Añade **{palabras[1]}** picado finamente para armar el fondo de sabor y dejar que se mezclen los jugos.\n"
-                if len(lista_ingredientes := palabras) >= 3:
-                    pasos += f"3.  **Amalgama:** Incorpora **{palabras[2]}** para darle la textura perfecta y el balance de nutrientes al plato.\n"
-                pasos += f"4.  **Terminado:** Baja el fuego y deja que todo se cocine por 5 minutos más hasta lograr {tecnica_elegida}. ¡Sirve inmediatamente!"
-
-                respuesta_chef = f"""
-### {titulo_plato}
-¡Brillante! Con los ingredientes que acabas de dictar en tiempo real, diseñamos {tecnica_elegida}:
-
-#### 🛒 Ingredientes Procesados:
-{ingredientes_lista}
-
-#### 📝 Preparación a la Medida:
-{pasos}
-"""
-                st.session_state["chat_dinamico_real"].append({"role": "assistant", "content": respuesta_chef})
-                st.rerun()
+                    # Le pedimos a la IA que haga dos tareas en una: transcribir e idear la receta
+                    instruccion_prompt = (
+                        "Primero, transcribe exactamente los ingredientes que escuchas en este audio en una línea que diga 'Ingredientes detectados: ...'. "
+                        "Luego, actuando como un chef profesional, diseña una receta creativa y estructurada utilizando únicamente esos ingredientes "
+                        "y básicos de despensa (sal, aceite). Dale un título llamativo y separa los pasos de forma clara."
+                    )
+                    
+                    # Llamada real al modelo multimodal
+                    respuesta_ia = model.generate_content([instruccion_prompt, input_audio])
+                    
+                    # Guardamos la interacción real en el chat
+                    st.session_state["chat_conversacional_real"].append({"role": "user", "content": "🎤 *[Mensaje de voz enviado]*"})
+                    st.session_state["chat_conversacional_real"].append({"role": "assistant", "content": respuesta_ia.text})
+                    
+                except Exception as e:
+                    st.error(f"Error al procesar el audio con la IA: {e}")
+                    st.info("Nota de desarrollo: Verifica que el formato del micrófono esté habilitado en tu navegador.")
         else:
-            st.warning("Primero debes grabar un audio o escribir los ingredientes.")
+            st.error("No se puede procesar el audio porque falta la clave API en la línea 13.")
 
 with col2:
-    st.subheader("💬 Historial del Chef SmartKitchen")
+    st.subheader("💬 Respuesta del Chef IA")
     
-    # Renderizar el chat interactivo
-    for msg in st.session_state["chat_dinamico_real"]:
+    # Renderizar la conversación completa en la pantalla
+    for msg in st.session_state["chat_conversacional_real"]:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    if len(st.session_state["chat_dinamico_real"]) > 1:
+    if len(st.session_state["chat_conversacional_real"]) > 1:
         st.write("---")
-        if st.button("🧹 Limpiar historial de recetas"):
-            st.session_state["chat_dinamico_real"] = [
-                {"role": "assistant", "content": "¡Listo! Todo limpio. ¿Qué nuevos ingredientes vas a dictar?"}
+        if st.button("🧹 Limpiar historial y reiniciar chef"):
+            st.session_state["chat_conversacional_real"] = [
+                {"role": "assistant", "content": "¡Todo despejado! ¿Qué nuevos ingredientes vas a dictar?"}
             ]
             st.rerun()
