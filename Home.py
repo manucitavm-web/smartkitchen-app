@@ -13,7 +13,7 @@ st.markdown("""
 ## Bienvenido a SmartKitchen
 
 Una cocina inteligente multimodal que permite:
-- 🎙️ Interacción por voz (Módulo Grabador)
+- 🍳 Asistente de Cocina Inteligente
 - 🌡️ Monitoreo de sensores desde el simulador Wokwi
 - ⏱️ Temporizadores y alertas en la nube
 - 🖼️ Procesamiento de imágenes con Pillow
