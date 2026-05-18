@@ -1,79 +1,109 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-import google.generativeai as genai
+import time
+import random
 
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Cocina con IA Real")
-st.write("Escribe o dicta libremente los ingredientes que tienes en tu nevera y la IA te creará una receta única.")
+st.markdown("# 🎙️ Asistente de Cocina Inteligente")
+st.write("Dicta o escribe libremente los ingredientes de tu nevera para diseñar una receta instantánea.")
 st.write("---")
 
-# 🔐 CONFIGURACIÓN DE LA IA (Pega aquí tu clave de Google AI Studio)
-# Nota: Para producción es mejor usar st.secrets, pero para tu entrega puedes ponerla directo aquí:
-API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q" 
-
-if API_KEY != "TU_API_KEY_AQUÍ":
-    genai.configure(api_key=API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-flash-latest')
-else:
-    st.warning("⚠️ Recuerda poner tu API Key de Google AI Studio en el código para que la IA responda.")
-
-# Inicializar el historial del chat en la memoria de la página
-if "chat_real" not in st.session_state:
-    st.session_state["chat_real"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu chef de IA. Dime qué ingredientes tienes (ej: *'tengo pollo, papas y limón'*) y te diré qué cocinar."}
+# Inicializar el historial del chat en la memoria de la aplicación
+if "chat_廚房" not in st.session_state:
+    st.session_state["chat_廚房"] = [
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy (ej: *'pollo, papas, cebolla'*) y te armaré una receta a la medida de inmediato."}
     ]
 
 col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("🎙️ ¿Qué tienes en tu nevera?")
+    st.subheader("🎙️ ¿Qué tienes a la mano?")
     
-    # Grabador nativo para interactuar por voz
+    # Grabador interactivo para la simulación de voz
     audio = mic_recorder(
-        start_prompt="🎙️ Grabar mis ingredientes",
+        start_prompt="🎙️ Grabar ingredientes",
         stop_prompt="🛑 Detener grabación",
         just_once=False,
-        key="mic_real"
+        key="mic_asistente"
     )
     
     if audio:
         st.audio(audio['bytes'], format='audio/wav')
-        st.info("🎙️ ¡Audio registrado! (Nota: Escribe tus ingredientes abajo para que la IA los procese textualmente de forma exacta en esta versión web).")
+        st.toast("¡Audio capturado en el sistema!", icon="🎤")
 
-    # Cuadro de entrada libre para el usuario (Chat interactivo real)
-    ingredientes_usuario = st.text_input("Escribe aquí lo que tienes (¡Lo que quieras de verdad!):", placeholder="Ej: yuca, queso, carne molida y cebolla")
+    # Entrada libre y real de texto para que escribas lo que quieras
+    ingredientes = st.text_input(
+        "Ingresa tus ingredientes separados por comas:", 
+        placeholder="Ej: carne, tomate, arroz, plátano",
+        key="input_ingredientes"
+    )
 
     if st.button("✨ Generar Receta Personalizada", type="primary", use_container_width=True):
-        if ingredientes_usuario:
-            # Guardamos lo que dijo el usuario en el chat
-            st.session_state["chat_real"].append({"role": "user", "content": ingredientes_usuario})
+        if ingredientes:
+            # Registrar el mensaje del usuario en el chat
+            st.session_state["chat_廚房"].append({"role": "user", "content": f"Tengo: {ingredientes}"})
             
-            if API_KEY != "TU_API_KEY_AQUÍ":
-                with st.spinner("El Chef de IA está creando tu receta..."):
-                    try:
-                        # Creamos un prompt de diseño UX para que la IA responda estructurado
-                        prompt_chef = f"Actúa como un chef profesional de asistencia en casa. El usuario te dice que tiene estos ingredientes de forma libre: '{ingredientes_usuario}'. Diseña una receta creativa, rápida y deliciosa usando únicamente esos ingredientes y básicos de despensa (sal, aceite). Dale un título llamativo y estructura los pasos de forma clara."
-                        
-                        respuesta = model.generate_content(prompt_chef)
-                        st.session_state["chat_real"].append({"role": "assistant", "content": respuesta.text})
-                    except Exception as e:
-                        st.error(f"Error al conectar con Gemini: {e}")
-            else:
-                st.error("No puedo generar la receta porque no has puesto tu API Key en la línea 13.")
+            with st.spinner("Nuestro chef digital está combinando tus ingredientes..."):
+                time.sleep(1.5)  # Simula un tiempo de procesamiento fluido
+                
+                # Procesamos el texto del usuario de forma dinámica
+                lista_ingredientes = [i.strip().capitalize() for i in ingredientes.split(",") if i.strip()]
+                
+                # Técnicas de cocina aleatorias para darle variedad al texto generado
+                tecnicas = ["un salteado rápido", "un estofado rústico", "un tazón templado estilo bowl", "una cazuela casera"]
+                tecnica_elegida = random.choice(tecnicas)
+                
+                # Estructura de la receta dinámica basada en la entrada real del usuario
+                titulo_plato = f"👨‍🍳 {lista_ingredientes[0]} Especial SmartKitchen" if len(lista_ingredientes) > 0 else "👨‍🍳 Plato Sorpresa"
+                
+                ingredientes_formateados = "\n".join([f"* **{ing}** (lo que tienes en casa)." for ing in lista_ingredientes])
+                
+                pasos_dinamicos = ""
+                if len(lista_ingredientes) >= 1:
+                    pasos_dinamicos += f"1.  **Preparación base:** Toma el ingrediente principal (**{lista_ingredientes[0]}**), pícalo en trozos cómodos y dóralo en una sartén con un chorrito de aceite, sal y pimienta.\n"
+                if len(lista_ingredientes) >= 2:
+                    pasos_dinamicos += f"2.  **Integración:** Incorpora el segundo ingrediente (**{lista_ingredientes[1]}**) finamente picado para armar una base aromática llena de sabor.\n"
+                if len(lista_ingredientes) >= 3:
+                    pasos_dinamicos += f"3.  **Complemento técnico:** Suma **{lista_ingredientes[2]}** para aportar textura y cuerpo a la preparación media.\n"
+                else:
+                    pasos_dinamicos += "3.  **Sazón:** Añade las especias que más te gusten de tu despensa para realzar los aromas.\n"
+                
+                pasos_dinamicos += f"4.  **Montaje:** Junta todo a fuego medio bajo por 5 minutos adicionales hasta lograr {tecnica_elegida}. ¡Sirve caliente y disfruta!"
+
+                # Respuesta armada dinámicamente con los datos reales del usuario
+                respuesta_chef = f"""
+### {titulo_plato}
+¡Excelente combinación! Con lo que me listaste podemos preparar {tecnica_elegida}. Aquí tienes la propuesta estructurada:
+
+#### 🛒 Ingredientes a Utilizar:
+{ingredientes_formateados}
+* *Básicos de cocina:* Aceite, sal y pimienta.
+
+#### 📝 Modo de Preparación:
+{pasos_dinamicos}
+
+---
+💡 **Consejo de Diseño UX:** Recuerda que si este plato genera vapores o humos intensos, puedes ir a la pestaña **Alertas y Tiempos** para encender el extractor remoto en Wokwi.
+"""
+                # Guardar respuesta en el historial
+                st.session_state["chat_廚房"].append({"role": "assistant", "content": respuesta_chef})
+        else:
+            st.warning("Escribe al menos un ingrediente para poder ayudarte.")
 
 with col2:
-    st.subheader("💬 Menú y Respuestas del Chef IA")
+    st.subheader("💬 Menú y Sugerencias del Asistente")
     
-    # Renderizado del chat interactivo
-    for msg in st.session_state["chat_real"]:
+    # Renderizar el historial completo
+    for msg in st.session_state["chat_廚房"]:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    if len(st.session_state["chat_real"]) > 1:
+    # Botón para limpiar pantalla
+    if len(st.session_state["chat_廚房"]) > 1:
         st.write("---")
-        if st.button("🧹 Limpiar Nevera y Reiniciar Chat"):
-            st.session_state["chat_real"] = [
-                {"role": "assistant", "content": "¡Listo! Nevera vacía. ¿Qué nuevos ingredientes tienes ahora?"}
+        if st.button("🧹 Limpiar historial de recetas"):
+            st.session_state["chat_廚房"] = [
+                {"role": "assistant", "content": "¡Listo! Todo despejado. ¿Qué otros ingredientes tienes para probar hoy?"}
             ]
             st.rerun()
