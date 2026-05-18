@@ -2,4 +2,4 @@ streamlit
 streamlit-mic-recorder
 paho-mqtt
 Pillow
-google-generativeai
+SpeechRecognition
