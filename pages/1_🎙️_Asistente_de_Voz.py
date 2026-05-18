@@ -1,70 +1,79 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
-import time
+import google.generativeai as genai
 
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Cocina Conversacional")
-st.write("Habla libremente con la IA. Dicta los ingredientes que tengas a la mano para recibir ideas personalizadas.")
+st.markdown("# 🎙️ Asistente de Cocina con IA Real")
+st.write("Escribe o dicta libremente los ingredientes que tienes en tu nevera y la IA te creará una receta única.")
 st.write("---")
 
-# Inicializar el historial de conversación en la memoria de la app si no existe
-if "historial_chat" not in st.session_state:
-    st.session_state["historial_chat"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy y te diseñaré una receta a la medida."}
+# 🔐 CONFIGURACIÓN DE LA IA (Pega aquí tu clave de Google AI Studio)
+# Nota: Para producción es mejor usar st.secrets, pero para tu entrega puedes ponerla directo aquí:
+API_KEY = "TU_API_KEY_AQUÍ" 
+
+if API_KEY != "TU_API_KEY_AQUÍ":
+    genai.configure(api_key=API_KEY)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+else:
+    st.warning("⚠️ Recuerda poner tu API Key de Google AI Studio en el código para que la IA responda.")
+
+# Inicializar el historial del chat en la memoria de la página
+if "chat_real" not in st.session_state:
+    st.session_state["chat_real"] = [
+        {"role": "assistant", "content": "¡Hola! Soy tu chef de IA. Dime qué ingredientes tienes (ej: *'tengo pollo, papas y limón'*) y te diré qué cocinar."}
     ]
 
 col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("🎙️ Entrada de Voz")
-    st.write("Presiona el botón, menciona tus ingredientes en voz alta y detén la grabación:")
+    st.subheader("🎙️ ¿Qué tienes en tu nevera?")
     
-    # Grabador de audio nativo de tus requerimientos
-    audio_registro = mic_recorder(
-        start_prompt="🎙️ Hablar con la IA",
-        stop_prompt="🛑 Enviar Mensaje",
+    # Grabador nativo para interactuar por voz
+    audio = mic_recorder(
+        start_prompt="🎙️ Grabar mis ingredientes",
+        stop_prompt="🛑 Detener grabación",
         just_once=False,
-        key="chat_mic"
+        key="mic_real"
     )
+    
+    if audio:
+        st.audio(audio['bytes'], format='audio/wav')
+        st.info("🎙️ ¡Audio registrado! (Nota: Escribe tus ingredientes abajo para que la IA los procese textualmente de forma exacta en esta versión web).")
 
-    if audio_registro:
-        st.audio(audio_registro['bytes'], format='audio/wav')
-        
-        with st.spinner("Transcribiendo y pensando..."):
-            time.sleep(2) # Simulación del procesamiento de lenguaje natural
+    # Cuadro de entrada libre para el usuario (Chat interactivo real)
+    ingredientes_usuario = st.text_input("Escribe aquí lo que tienes (¡Lo que quieras de verdad!):", placeholder="Ej: yuca, queso, carne molida y cebolla")
+
+    if st.button("✨ Generar Receta Personalizada", type="primary", use_container_width=True):
+        if ingredientes_usuario:
+            # Guardamos lo que dijo el usuario en el chat
+            st.session_state["chat_real"].append({"role": "user", "content": ingredientes_usuario})
             
-            # --- SIMULACIÓN DE DETECCIÓN LINGÜÍSTICA DINÁMICA ---
-            # Aquí simulamos que la IA extrae el texto del audio y responde de manera fluida
-            # En un entorno de producción, aquí conectarías la API de Gemini o OpenAI
-            consulta_usuario = "Tengo papas, carne de res, cebolla y un tomate."
-            respuesta_ia = (
-                "¡Excelente combinación! Con esos ingredientes podemos preparar un **Lomo Saltado Exprés** o un **Estofado Rústico**. "
-                "Aquí tienes la propuesta:\n\n"
-                "**Paso 1:** Corta la carne en tiras y séllala a fuego alto en una sartén con aceite.\n"
-                "**Paso 2:** Retira la carne y en la misma sartén sofríe la cebolla y el tomate en gajos.\n"
-                "**Paso 3:** Mezcla todo, añade las papas (puedes hacerlas cocidas o fritas) y sazona con sal y pimienta. "
-                "¡Quedará delicioso!"
-            )
-            # ────────────────────────────────────────────────────
-        
-        # Guardar la interacción en el historial para que se renderice en el chat
-        st.session_state["historial_chat"].append({"role": "user", "content": f"🎤 *[Audio enviado]* -> \"{consulta_usuario}\""})
-        st.session_state["historial_chat"].append({"role": "assistant", "content": respuesta_ia})
+            if API_KEY != "TU_API_KEY_AQUÍ":
+                with st.spinner("El Chef de IA está creando tu receta..."):
+                    try:
+                        # Creamos un prompt de diseño UX para que la IA responda estructurado
+                        prompt_chef = f"Actúa como un chef profesional de asistencia en casa. El usuario te dice que tiene estos ingredientes de forma libre: '{ingredientes_usuario}'. Diseña una receta creativa, rápida y deliciosa usando únicamente esos ingredientes y básicos de despensa (sal, aceite). Dale un título llamativo y estructura los pasos de forma clara."
+                        
+                        respuesta = model.generate_content(prompt_chef)
+                        st.session_state["chat_real"].append({"role": "assistant", "content": respuesta.text})
+                    except Exception as e:
+                        st.error(f"Error al conectar con Gemini: {e}")
+            else:
+                st.error("No puedo generar la receta porque no has puesto tu API Key en la línea 13.")
 
 with col2:
-    st.subheader("💬 Historial de la Conversación")
+    st.subheader("💬 Menú y Respuestas del Chef IA")
     
-    # Renderizar el chat de manera estética usando el formato nativo de Streamlit
-    for mensaje in st.session_state["historial_chat"]:
-        with st.chat_message(mensaje["role"]):
-            st.write(mensaje["content"])
+    # Renderizado del chat interactivo
+    for msg in st.session_state["chat_real"]:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    # Botón auxiliar para reiniciar la nevera/conversación
-    if len(st.session_state["historial_chat"]) > 1:
+    if len(st.session_state["chat_real"]) > 1:
         st.write("---")
-        if st.button("🧹 Limpiar conversación y empezar de nuevo"):
-            st.session_state["historial_chat"] = [
-                {"role": "assistant", "content": "¡Hola de nuevo! ¿Qué otros ingredientes encontraste en la cocina?"}
+        if st.button("🧹 Limpiar Nevera y Reiniciar Chat"):
+            st.session_state["chat_real"] = [
+                {"role": "assistant", "content": "¡Listo! Nevera vacía. ¿Qué nuevos ingredientes tienes ahora?"}
             ]
             st.rerun()
