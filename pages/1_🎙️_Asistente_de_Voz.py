@@ -1,109 +1,129 @@
 import streamlit as st
 from streamlit_mic_recorder import mic_recorder
+import speech_recognition as sr
+import io
 import time
 import random
 
 st.set_page_config(page_title="Asistente de Voz", page_icon="🎙️", layout="wide")
 
-st.markdown("# 🎙️ Asistente de Cocina Inteligente")
-st.write("Dicta o escribe libremente los ingredientes de tu nevera para diseñar una receta instantánea.")
+st.markdown("# 🎙️ Asistente de Cocina por Voz Nativó")
+st.write("Graba tu voz enumerando libremente los ingredientes que tienes y el sistema los procesará automáticamente.")
 st.write("---")
 
 # Inicializar el historial del chat en la memoria de la aplicación
-if "chat_廚房" not in st.session_state:
-    st.session_state["chat_廚房"] = [
-        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Dime qué ingredientes tienes en tu nevera hoy (ej: *'pollo, papas, cebolla'*) y te armaré una receta a la medida de inmediato."}
+if "chat_cocina_voz" not in st.session_state:
+    st.session_state["chat_cocina_voz"] = [
+        {"role": "assistant", "content": "¡Hola! Soy tu asistente SmartKitchen. Presiona el botón de la izquierda y dime qué tienes en la nevera hoy. ¡Te escucharé con atención!"}
     ]
+
+if "texto_transcrito" not in st.session_state:
+    st.session_state["texto_transcrito"] = ""
 
 col1, col2 = st.columns([1, 1.8], gap="large")
 
 with col1:
-    st.subheader("🎙️ ¿Qué tienes a la mano?")
+    st.subheader("🎙️ Grabadora de Ingredientes")
+    st.write("Haz clic, menciona tus alimentos de corrido (ej: *pollo papas cebolla*) y detén la grabación:")
     
-    # Grabador interactivo para la simulación de voz
+    # Componente de grabación nativo
     audio = mic_recorder(
-        start_prompt="🎙️ Grabar ingredientes",
-        stop_prompt="🛑 Detener grabación",
+        start_prompt="🎙️ Dictar mis ingredientes",
+        stop_prompt="🛑 Detener y Procesar",
         just_once=False,
-        key="mic_asistente"
+        key="mic_automatizado"
     )
     
     if audio:
         st.audio(audio['bytes'], format='audio/wav')
-        st.toast("¡Audio capturado en el sistema!", icon="🎤")
+        
+        # --- PROCESAMIENTO AUTOMÁTICO DE SPEECH-TO-TEXT ---
+        with st.spinner("Sincronizando audio y transcribiendo..."):
+            try:
+                # Convertir los bytes del micrófono en un archivo virtual de audio
+                archivo_audio = io.BytesIO(audio['bytes'])
+                reconocedor = sr.Recognizer()
+                
+                with sr.AudioFile(archivo_audio) as fuente:
+                    datos_audio = reconocedor.record(fuente)
+                    # Intentar transcribir usando el motor gratuito de Google en español
+                    texto = reconocedor.recognize_google(datos_audio, language="es-CO")
+                    st.session_state["texto_transcrito"] = texto
+                    st.success(f"🗣️ Te entendí: *\"{texto}\"*")
+            except sr.UnknownValueError:
+                st.error("No logré entender el audio con claridad. Intenta hablar un poco más fuerte o cerca al micrófono.")
+            except sr.RequestError:
+                st.warning("El servicio de transcripción rápida está saturado. No te preocupes, puedes usar la casilla de abajo.")
+            except Exception as e:
+                st.error(f"Nota del sistema: {e}")
 
-    # Entrada libre y real de texto para que escribas lo que quieras
-    ingredientes = st.text_input(
-        "Ingresa tus ingredientes separados por comas:", 
-        placeholder="Ej: carne, tomate, arroz, plátano",
-        key="input_ingredientes"
+    st.write("---")
+    
+    # Casilla auxiliar por si el usuario quiere corregir lo que dictó o escribir directamente
+    ingredientes_input = st.text_input(
+        "Ingredientes detectados (puedes editarlos libremente):", 
+        value=st.session_state["texto_transcrito"],
+        placeholder="Ej: carne papas plátano tomate"
     )
 
-    if st.button("✨ Generar Receta Personalizada", type="primary", use_container_width=True):
-        if ingredientes:
+    if st.button("✨ Generar Receta con estos Ingredientes", type="primary", use_container_width=True):
+        if ingredientes_input:
             # Registrar el mensaje del usuario en el chat
-            st.session_state["chat_廚房"].append({"role": "user", "content": f"Tengo: {ingredientes}"})
+            st.session_state["chat_cocina_voz"].append({"role": "user", "content": f"Tengo: {ingredientes_input}"})
             
-            with st.spinner("Nuestro chef digital está combinando tus ingredientes..."):
-                time.sleep(1.5)  # Simula un tiempo de procesamiento fluido
+            with st.spinner("El chef está diseñando tu menú..."):
+                time.sleep(1)
                 
-                # Procesamos el texto del usuario de forma dinámica
-                lista_ingredientes = [i.strip().capitalize() for i in ingredientes.split(",") if i.strip()]
+                # Limpiamos el texto libre del usuario (reemplaza espacios por comas si es necesario)
+                texto_limpio = ingredientes_input.replace(",", " ")
+                lista_ingredientes = [i.strip().capitalize() for i in texto_limpio.split(" ") if i.strip() and len(i.strip()) > 2]
                 
-                # Técnicas de cocina aleatorias para darle variedad al texto generado
-                tecnicas = ["un salteado rápido", "un estofado rústico", "un tazón templado estilo bowl", "una cazuela casera"]
-                tecnica_elegida = random.choice(tecnicas)
-                
-                # Estructura de la receta dinámica basada en la entrada real del usuario
-                titulo_plato = f"👨‍🍳 {lista_ingredientes[0]} Especial SmartKitchen" if len(lista_ingredientes) > 0 else "👨‍🍳 Plato Sorpresa"
-                
-                ingredientes_formateados = "\n".join([f"* **{ing}** (lo que tienes en casa)." for ing in lista_ingredientes])
-                
-                pasos_dinamicos = ""
-                if len(lista_ingredientes) >= 1:
-                    pasos_dinamicos += f"1.  **Preparación base:** Toma el ingrediente principal (**{lista_ingredientes[0]}**), pícalo en trozos cómodos y dóralo en una sartén con un chorrito de aceite, sal y pimienta.\n"
-                if len(lista_ingredientes) >= 2:
-                    pasos_dinamicos += f"2.  **Integración:** Incorpora el segundo ingrediente (**{lista_ingredientes[1]}**) finamente picado para armar una base aromática llena de sabor.\n"
-                if len(lista_ingredientes) >= 3:
-                    pasos_dinamicos += f"3.  **Complemento técnico:** Suma **{lista_ingredientes[2]}** para aportar textura y cuerpo a la preparación media.\n"
-                else:
-                    pasos_dinamicos += "3.  **Sazón:** Añade las especias que más te gusten de tu despensa para realzar los aromas.\n"
-                
-                pasos_dinamicos += f"4.  **Montaje:** Junta todo a fuego medio bajo por 5 minutos adicionales hasta lograr {tecnica_elegida}. ¡Sirve caliente y disfruta!"
+                if len(lista_ingredientes) == 0:
+                    lista_ingredientes = ["Ingredientes Variados"]
 
-                # Respuesta armada dinámicamente con los datos reales del usuario
+                tecnicas = ["un salteado rápido", "un estofado casero", "un plato al horno", "un tazón exprés"]
+                tecnica_elegida = random.choice(tecnicas)
+                titulo_plato = f"👨‍🍳 {lista_ingredientes[0]} Sorpresa"
+                
+                ingredientes_formateados = "\n".join([f"* **{ing}**" for ing in lista_ingredientes])
+                
+                # Lógica dinámica de preparación
+                pasos = f"1.  **Base:** Toma tu primer ingrediente (**{lista_ingredientes[0]}**), córtalo finamente y empieza a cocinarlo en una sartén con aceite.\n"
+                if len(lista_ingredientes) >= 2:
+                    pasos += f"2.  **Sabor:** Agrega **{lista_ingredientes[1]}** a la mezcla para potenciar los aromas del sartén.\n"
+                if len(lista_ingredientes) >= 3:
+                    pasos += f"3.  **Complemento:** Incorpora **{lista_ingredientes[2]}** para darle volumen e integrar las texturas de la preparación.\n"
+                pasos += f"4.  **Final:** Cocina todo junto a fuego medio por unos minutos hasta lograr {tecnica_elegida}. ¡Sazona al gusto y disfruta!"
+
                 respuesta_chef = f"""
 ### {titulo_plato}
-¡Excelente combinación! Con lo que me listaste podemos preparar {tecnica_elegida}. Aquí tienes la propuesta estructurada:
+¡Qué buena combinación! Con lo que dictaste organizamos {tecnica_elegida}:
 
-#### 🛒 Ingredientes a Utilizar:
+#### 🛒 Elementos utilizados:
 {ingredientes_formateados}
-* *Básicos de cocina:* Aceite, sal y pimienta.
 
-#### 📝 Modo de Preparación:
-{pasos_dinamicos}
-
----
-💡 **Consejo de Diseño UX:** Recuerda que si este plato genera vapores o humos intensos, puedes ir a la pestaña **Alertas y Tiempos** para encender el extractor remoto en Wokwi.
+#### 📝 Preparación paso a paso:
+{pasos}
 """
-                # Guardar respuesta en el historial
-                st.session_state["chat_廚房"].append({"role": "assistant", "content": respuesta_chef})
+                st.session_state["chat_cocina_voz"].append({"role": "assistant", "content": respuesta_chef})
+                # Limpiar la transcripción actual para la próxima interacción
+                st.session_state["texto_transcrito"] = ""
         else:
-            st.warning("Escribe al menos un ingrediente para poder ayudarte.")
+            st.warning("Por favor graba un audio o escribe algo en la casilla para poder procesarlo.")
 
 with col2:
-    st.subheader("💬 Menú y Sugerencias del Asistente")
+    st.subheader("💬 Historial del Chef SmartKitchen")
     
-    # Renderizar el historial completo
-    for msg in st.session_state["chat_廚房"]:
+    # Renderizar los mensajes del chat interactivo
+    for msg in st.session_state["chat_cocina_voz"]:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
-    # Botón para limpiar pantalla
-    if len(st.session_state["chat_廚房"]) > 1:
+    if len(st.session_state["chat_cocina_voz"]) > 1:
         st.write("---")
-        if st.button("🧹 Limpiar historial de recetas"):
-            st.session_state["chat_廚房"] = [
-                {"role": "assistant", "content": "¡Listo! Todo despejado. ¿Qué otros ingredientes tienes para probar hoy?"}
+        if st.button("🧹 Reiniciar Conversación"):
+            st.session_state["chat_cocina_voz"] = [
+                {"role": "assistant", "content": "¡Listo! Todo borrado. ¿Qué ingredientes tienes ahora?"}
             ]
+            st.session_state["texto_transcrito"] = ""
             st.rerun()
