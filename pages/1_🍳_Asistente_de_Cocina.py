@@ -21,8 +21,8 @@ with col1:
     
     # Entrada libre y directa de texto
     ingredientes = st.text_input(
-        "Lista de Ingredientes:", 
-        placeholder="Ej: carne tomate arroz plátano",
+        "Ingredientes:", 
+        placeholder="Escribe los ingredientes...",
         key="input_ingredientes"
     )
 
