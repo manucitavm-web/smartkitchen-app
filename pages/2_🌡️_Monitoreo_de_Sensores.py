@@ -10,7 +10,7 @@ st.write("---")
 
 BROKER = "broker.hivemq.com"
 PORT = 1883
-TOPIC = "smartkitchen/telemetria"
+TOPIC = "manuela_vallejo/smartkitchen"
 
 # Inicializar los estados de la sesión en español para evitar vacíos
 if "temperatura" not in st.session_state:
