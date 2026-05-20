@@ -10,7 +10,7 @@ st.write("Visualiza las variables capturadas por tu circuito virtual en tiempo r
 st.write("---")
 
 # 📡 Configuración de red (Idéntica a tu código de Wokwi)
-BROKER = "broker.emqx.io"
+BROKER = "broker.hivemq.com"
 PORT = 1883
 TOPIC = "manuela_vallejo/smartkitchen"
 
