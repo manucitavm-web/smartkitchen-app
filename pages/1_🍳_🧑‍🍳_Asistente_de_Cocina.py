@@ -48,7 +48,7 @@ for msg in st.session_state.messages:
         st.write(msg["content"])
 
 # Input del usuario
-if prompt := st.chat_input("Escribe un mensaje..."):
+if prompt := st.chat_input("Escribe tus ingredientes..."):
     if not api_key:
         st.warning("Por favor ingresa tu API Key en el panel lateral.")
         st.stop()
