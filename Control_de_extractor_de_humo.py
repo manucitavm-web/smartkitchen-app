@@ -59,7 +59,7 @@ client1= paho.Client("GIT-HUBM") # ID Original
 client1.on_message = on_message
 
 # --- INTERFAZ ---
-st.title("MQTT Control")
+st.title("Control de extractor de humo")
 
 # Botones organizados en columnas para mejor estética
 col1, col2 = st.columns(2)
