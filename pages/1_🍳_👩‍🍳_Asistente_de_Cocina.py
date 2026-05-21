@@ -59,7 +59,7 @@ with st.sidebar:
         )
 
 # ── MAIN (INTERFAZ DE CHAT) ─────────────────────────────
-st.title("🍳🧑‍🍳 Asistente de Cocina Virtual")
+st.title("🍳👩‍🍳 Asistente de Cocina Virtual")
 st.write("¡Hola! Soy tu chef personal. Dime qué ingredientes tienes y crearemos algo increíble juntos.")
 st.write("---")
 
