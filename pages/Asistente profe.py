@@ -65,7 +65,7 @@ if analyze_button:
                 base64_image = encode_image(uploaded_file)
 
                 # Prompt base
-                prompt_text = "Describe lo que ves en la imagen en español."
+                prompt_text = "Eres un asistente de cocina, dependiendo de los ingredientes que ingresen vas a recomnedar una receta."
 
                 if additional_details:
                     prompt_text += f"\n\nContexto adicional del usuario:\n{additional_details}"
