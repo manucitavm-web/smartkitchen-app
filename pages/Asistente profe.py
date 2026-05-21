@@ -1,108 +1,86 @@
-import os
 import streamlit as st
-import base64
 from openai import OpenAI
 
-# Función para convertir la imagen a base64
-def encode_image(image_file):
-    return base64.b64encode(image_file.getvalue()).decode("utf-8")
+st.set_page_config(page_title="Mi propio chat", page_icon="💬", layout="centered")
 
+# ── Sidebar ──────────────────────────────────────────────
+with st.sidebar:
+    st.header("⚙️ Configuración")
 
-# Configuración de la página
-st.set_page_config(
-    page_title="Análisis de Imagen",
-    layout="centered",
-    initial_sidebar_state="collapsed"
-)
+    api_key = st.text_input("🔑 OpenAI API Key", type="password", placeholder="sk-...")
 
-st.title("Análisis de Imágenes")
+    model = st.selectbox("Modelo", ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo"])
 
-# Input de API Key (oculta)
-ke = st.text_input("Ingresa tu Clave", type="password")
+    st.divider()
 
-# Validar API key
-api_key = ke.strip() if ke else None
+    st.subheader("🤖 Personalidad")
 
-# Crear cliente solo si hay API key
-client = None
-if api_key:
-    try:
-        client = OpenAI(api_key=api_key)
-    except Exception as e:
-        st.error(f"Error al inicializar OpenAI: {e}")
+    if "system_prompt" not in st.session_state:
+        st.session_state.system_prompt = ""
 
-# Subir imagen
-uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "png", "jpeg"])
+    system_input = st.text_area(
+        "System Prompt",
+        value=st.session_state.system_prompt,
+        placeholder="Ej: Eres un asistente muy gracioso, responde siempre con algo gracioso.",
+        height=180,
+        label_visibility="collapsed"
+    )
 
-if uploaded_file:
-    with st.expander("Imagen", expanded=True):
-        st.image(uploaded_file, caption=uploaded_file.name, use_container_width=True)
+    if st.button("💾 Guardar personalidad", use_container_width=True):
+        st.session_state.system_prompt = system_input
+        st.success("¡Guardado!")
 
-# Opción de pregunta adicional
-show_details = st.toggle("Pregunta algo específico sobre la imagen", value=False)
+    if st.session_state.system_prompt:
+        st.caption(f"✅ Activo: *{st.session_state.system_prompt[:60]}...*" 
+                   if len(st.session_state.system_prompt) > 60 
+                   else f"✅ Activo: *{st.session_state.system_prompt}*")
 
-additional_details = ""
-if show_details:
-    additional_details = st.text_area("Añade contexto o pregunta sobre la imagen:")
+# ── Main ─────────────────────────────────────────────────
+st.title("💬 Mi propio Chat")
 
-# Botón de análisis
-analyze_button = st.button("Analizar imagen")
+# Inicializar historial
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Lógica principal
-if analyze_button:
+# Mostrar historial
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
 
+# Input del usuario
+if prompt := st.chat_input("Escribe un mensaje..."):
     if not api_key:
-        st.warning("Por favor ingresa tu API key.")
-    
-    elif not uploaded_file:
-        st.warning("Por favor sube una imagen.")
-    
-    else:
-        with st.spinner("Analizando imagen..."):
+        st.warning("Por favor ingresa tu API Key en el panel lateral.")
+        st.stop()
 
+    # Mostrar mensaje del usuario
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.write(prompt)
+
+    # Construir lista de mensajes con system prompt
+    messages_to_send = []
+    if st.session_state.system_prompt:
+        messages_to_send.append({"role": "system", "content": st.session_state.system_prompt})
+    messages_to_send += st.session_state.messages
+
+    # Llamar a OpenAI
+    client = OpenAI(api_key=api_key)
+    with st.chat_message("assistant"):
+        with st.spinner("Pensando..."):
             try:
-                # Convertir imagen
-                base64_image = encode_image(uploaded_file)
-
-                # Prompt base
-                prompt_text = "Eres un asistente de cocina, dependiendo de los ingredientes que ingresen vas a recomnedar una receta."
-
-                if additional_details:
-                    prompt_text += f"\n\nContexto adicional del usuario:\n{additional_details}"
-
-                # Mensaje para la API
-                messages = [
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt_text},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/jpeg;base64,{base64_image}"
-                                }
-                            },
-                        ],
-                    }
-                ]
-
-                # Streaming de respuesta
-                full_response = ""
-                message_placeholder = st.empty()
-
-                for chunk in client.chat.completions.create(
-                    model="gpt-4o",
-                    messages=messages,
-                    max_tokens=1200,
-                    stream=True
-                ):
-                    if chunk.choices[0].delta.content is not None:
-                        full_response += chunk.choices[0].delta.content
-                        message_placeholder.markdown(full_response + "▌")
-
-                message_placeholder.markdown(full_response)
-
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=messages_to_send,
+                )
+                reply = response.choices[0].message.content
+                st.write(reply)
+                st.session_state.messages.append({"role": "assistant", "content": reply})
             except Exception as e:
-                import traceback
                 st.error(f"Error: {e}")
-                st.text(traceback.format_exc())
+
+# Botón limpiar
+if st.session_state.messages:
+    if st.button("🗑️ Limpiar conversación"):
+        st.session_state.messages = []
+        st.rerun()
