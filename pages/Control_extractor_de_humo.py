@@ -4,37 +4,38 @@ import streamlit as st
 import json
 import platform
 
-# --- CONFIGURACIÓN ESTÉTICA (SÓLO VISUAL) ---
-st.set_page_config(page_title="Control de extractor de humo", page_icon="🌸")
+# --- CONFIGURACIÓN ESTÉTICA (SÓLO VISUAL - AHORA EN AZUL) ---
+st.set_page_config(page_title="Control de extractor de humo", page_icon="🌀")
 
 st.markdown("""
     <style>
-    /* Fondo de la página */
-    .main { background-color: #fffafa; }
+    /* Fondo de la página en un gris azulado muy sutil y limpio */
+    .main { background-color: #F4F6F9; }
     
-    /* Títulos y textos en tonos fucsia */
-    h1, h2, h3, p, span, label { color: #ff1493 !important; }
+    /* Títulos y textos en azul oscuro elegante */
+    h1, h2, h3, p, span, label { color: #1E3A8A !important; }
 
-    /* Estilo para TODOS los botones de Streamlit (Encender, Apagar, Enviar) */
+    /* Estilo para TODOS los botones de Streamlit (Encender y Apagar) */
     div.stButton > button {
-        background-color: #ff69b4 !important;
+        background-color: #3B82F6 !important; /* Azul vibrante */
         color: white !important;
         border-radius: 20px !important;
-        border: 2px solid #ffb6c1 !important;
+        border: 2px solid #60A5FA !important; /* Azul claro para el borde */
         width: 100%;
         font-weight: bold;
         transition: 0.3s;
     }
     
+    /* Efecto al pasar el mouse por encima del botón */
     div.stButton > button:hover {
-        background-color: #ff1493 !important;
-        border: 2px solid #db7093 !important;
+        background-color: #1D4ED8 !important; /* Azul más oscuro al presionar */
+        border: 2px solid #2563EB !important;
         transform: scale(1.02);
     }
 
-    /* Personalización del Slider */
+    /* Personalización del Slider en tonos azules por si lo vuelves a usar */
     .stSlider > div > div > div > div {
-        background-color: #ff69b4 !important;
+        background-color: #3B82F6 !important;
     }
     </style>
     """, unsafe_allow_html=True)
