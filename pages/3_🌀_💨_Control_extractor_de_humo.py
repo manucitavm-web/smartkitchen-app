@@ -60,7 +60,7 @@ client1= paho.Client("GIT-HUBM") # ID Original
 client1.on_message = on_message
 
 # --- INTERFAZ ---
-st.title("🌀💨 Control de extractor de humo")
+st.title("🌀💨 Control de Extractor de Humo")
 
 # Descripción integrada (Opción 2)
 st.write("Panel de control remoto para extractor de humo de tu cocina inteligente (Smart Kitchen). Esta pestaña de la aplicación te ofrece una solución interactiva de automatización donde, mediante dos botones: Encendido y Apagado, podrás intervenir en el estado del sistema de ventilación instantáneamente y sin configuraciones complejas.")
