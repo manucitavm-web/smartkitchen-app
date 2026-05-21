@@ -6,6 +6,35 @@ import time
 # Configuración inicial de la página (Layout ancho para mejor visualización UX)
 st.set_page_config(page_title="Monitoreo Wokwi", page_icon="🌡️", layout="wide")
 
+# --- CONFIGURACIÓN ESTÉTICA UNIFICADA (AZUL) ---
+st.markdown("""
+    <style>
+    /* Fondo de la página en un gris azulado muy sutil y limpio */
+    .main { background-color: #F4F6F9; }
+    
+    /* Títulos y textos en azul oscuro elegante */
+    h1, h2, h3, p, span, label, .stMetric { color: #1E3A8A !important; }
+
+    /* Estilo para TODOS los botones de Streamlit (Incluyendo el primario de actualizar) */
+    div.stButton > button {
+        background-color: #3B82F6 !important; /* Azul vibrante unificado */
+        color: white !important;
+        border-radius: 20px !important;
+        border: 2px solid #60A5FA !important; /* Azul claro para el borde */
+        width: 100%;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    
+    /* Efecto al pasar el mouse por encima del botón */
+    div.stButton > button:hover {
+        background-color: #1D4ED8 !important; /* Azul más oscuro al presionar */
+        border: 2px solid #2563EB !important;
+        transform: scale(1.02);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 st.markdown("# 🌡️💧 Monitoreo de Sensores")
 st.write("Visualiza las variables capturadas por tu circuito virtual en tiempo real.")
 st.write("---")
@@ -40,22 +69,6 @@ c1.metric(label="🌡️ Temperatura Horno", value=st.session_state["temperatura
 c2.metric(label="💧 Humedad Ambiente", value=st.session_state["humedad"])
 
 st.write("---")
-
-# 🎨 Personalización estética del botón lila mediante inyección de CSS
-st.markdown("""
-    <style>
-    div.stButton > button[kind="primary"] {
-        background-color: #5C6BC0;
-        color: white;
-        border-color: #5C6BC0;
-    }
-    div.stButton > button[kind="primary"]:hover {
-        background-color: #3F51B5;
-        color: white;
-        border-color: #3F51B5;
-    }
-    </style>
-""", unsafe_allow_html=True)
 
 # 🔄 Botón interactivo bajo demanda con ventana de tiempo ampliada (Evita el aviso amarillo)
 if st.button("🔄 Actualizar Lecturas de Wokwi", type="primary", use_container_width=True):
