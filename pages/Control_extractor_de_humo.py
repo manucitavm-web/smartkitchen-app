@@ -65,8 +65,8 @@ st.title("🌀 Control de extractor de humo")
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button('ON'):
-        act1="ON"
+    if st.button('Encender'):
+        act1="Encender"
         client1= paho.Client("GIT-HUBM")                           
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
@@ -76,8 +76,8 @@ with col1:
         st.write('')
 
 with col2:
-    if st.button('OFF'):
-        act1="OFF"
+    if st.button('Apagar'):
+        act1="Apagar"
         client1= paho.Client("GIT-HUBM")                           
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
