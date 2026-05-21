@@ -8,7 +8,7 @@ st.write("Escribe libremente los ingredientes que tienes en tu nevera y nuestra 
 st.write("---")
 
 # 🔐 CLAVE API DE GOOGLE AI STUDIO
-API_KEY = "AIzaSyBGng7EBh0dKFD53KXz7cOapi5e4Pjlp9Q"
+API_KEY = st.text_input("clave")
 
 try:
     genai.configure(api_key=API_KEY)
