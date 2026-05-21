@@ -1,7 +1,7 @@
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="Mi propio chat", page_icon="💬", layout="centered")
+st.set_page_config(page_title="Asistente de Cocina Virtual", page_icon="💬", layout="centered")
 
 # ── Sidebar ──────────────────────────────────────────────
 with st.sidebar:
