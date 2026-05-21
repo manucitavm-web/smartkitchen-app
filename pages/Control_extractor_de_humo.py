@@ -63,7 +63,7 @@ client1.on_message = on_message
 st.title("🌀 Control de extractor de humo")
 
 # Descripción integrada (Opción 2)
-st.write("Panel de control remoto para el extractor de humo de la cocina inteligente (Smart Kitchen). Esta pestaña de la aplicación ofrece una solución interactiva de automatización donde, mediante botones dedicados de Encendido y Apagado, cualquier usuario puede intervenir el estado del sistema de ventilación instantáneamente y sin configuraciones complejas.")
+st.write("Panel de control remoto para extractor de humo de tu cocina inteligente (Smart Kitchen). Esta pestaña de la aplicación te ofrece una solución interactiva de automatización donde, mediante dos botones: Encendido y Apagado, podrás intervenir en el estado del sistema de ventilación instantáneamente y sin configuraciones complejas.")
 st.write("---")
 
 # Botones organizados en columnas para mejor estética
