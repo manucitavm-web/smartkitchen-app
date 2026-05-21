@@ -3,3 +3,4 @@ streamlit-mic-recorder
 paho-mqtt
 Pillow
 google-generativeai
+openai
