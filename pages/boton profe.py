@@ -74,7 +74,7 @@ with col1:
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
         message = json.dumps({"Act1":act1})
-        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", message) # Tópico Original
+        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", ENCENDER_EXTRACTOR) # Tópico Original
     else:
         st.write('')
 
@@ -85,7 +85,7 @@ with col2:
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
         message = json.dumps({"Act1":act1})
-        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", message) # Tópico Original
+        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", APAGAR_EXTRACTOR) # Tópico Original
     else:
         st.write('')
 
