@@ -36,7 +36,9 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("# 🌡️💧 Monitoreo de Sensores")
-st.write("Visualiza las variables capturadas por tu circuito virtual en tiempo real.")
+
+# Descripción integrada alineada con el estilo de la pestaña anterior
+st.write("Panel de visualización de datos para la cocina inteligente (Smart Kitchen). Esta pestaña de la aplicación ofrece una solución interactiva de monitoreo donde cualquier usuario puede revisar el estado térmico del horno y la humedad del ambiente en tiempo real, facilitando el seguimiento preventivo de las variables climáticas del entorno.")
 st.write("---")
 
 # 📡 Datos de red (Mismo broker de tu trabajo anterior + tu canal único)
