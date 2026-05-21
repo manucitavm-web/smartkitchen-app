@@ -36,7 +36,7 @@ with st.sidebar:
                    else f"✅ Activo: *{st.session_state.system_prompt}*")
 
 # ── Main ─────────────────────────────────────────────────
-st.title("💬🍳 Asistente de Cocina Virtual")
+st.title("🍳🧑‍🍳 Asistente de Cocina Virtual")
 
 # Inicializar historial
 if "messages" not in st.session_state:
