@@ -56,7 +56,7 @@ def on_message(client, userdata, message):
     message_received=str(message.payload.decode("utf-8"))
     st.write(message_received)
 
-broker="157.230.214.127"
+broker="broker.mqttdashboard.com"
 port=1883
 client1= paho.Client("GIT-HUBM") # ID Original
 client1.on_message = on_message
@@ -74,7 +74,7 @@ with col1:
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
         message = json.dumps({"Act1":act1})
-        ret= client1.publish("cmqtt_manu", message) # Tópico Original
+        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", message) # Tópico Original
     else:
         st.write('')
 
@@ -85,7 +85,7 @@ with col2:
         client1.on_publish = on_publish                          
         client1.connect(broker,port)  
         message = json.dumps({"Act1":act1})
-        ret= client1.publish("cmqtt_manu", message) # Tópico Original
+        ret= client1.publish("manuela_vallejo/smartkitchen/comandos", message) # Tópico Original
     else:
         st.write('')
 
