@@ -89,16 +89,4 @@ with col2:
     else:
         st.write('')
 
-st.markdown("---") # Línea separadora estética
 
-values = st.slider('Selecciona el rango de valores', 0.0, 100.0)
-st.write('Values:', values)
-
-if st.button('Enviar valor analógico'):
-    client1= paho.Client("GIT-HUBM")                           
-    client1.on_publish = on_publish                          
-    client1.connect(broker,port)   
-    message = json.dumps({"Analog": float(values)})
-    ret= client1.publish("cmqtt_manu", message) # Tópico Original
-else:
-    st.write('')
