@@ -79,7 +79,7 @@ st.markdown("""
 <p>Una cocina inteligente multimodal que permite:</p>
 
 <ul>
-<li>🍳 Asistente de Cocina Inteligente</li>
+<li>🍳👩‍🍳 Asistente de Cocina Inteligente</li>
 <li>🌡️💧 Monitoreo de Sensores</li>
 <li>🌀💨 Control Extractor de Humo</li>
 </ul>
