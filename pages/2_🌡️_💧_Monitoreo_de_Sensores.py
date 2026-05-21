@@ -6,7 +6,7 @@ import time
 # Configuración inicial de la página (Layout ancho para mejor visualización UX)
 st.set_page_config(page_title="Monitoreo Wokwi", page_icon="🌡️", layout="wide")
 
-st.markdown("# 🌡️ Monitoreo de Sensores (Wokwi)")
+st.markdown("# 🌡️💧 Monitoreo de Sensores")
 st.write("Visualiza las variables capturadas por tu circuito virtual en tiempo real.")
 st.write("---")
 
