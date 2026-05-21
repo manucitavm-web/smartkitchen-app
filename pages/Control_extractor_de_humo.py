@@ -4,7 +4,7 @@ import streamlit as st
 import json
 import platform
 
-# --- CONFIGURACIÓN ESTÉTICA (SÓLO VISUAL - AHORA EN AZUL) ---
+# --- CONFIGURACIÓN ESTÉTICA (SÓLO VISUAL) ---
 st.set_page_config(page_title="Control de extractor de humo", page_icon="🌀")
 
 st.markdown("""
@@ -33,7 +33,7 @@ st.markdown("""
         transform: scale(1.02);
     }
 
-    /* Personalización del Slider en tonos azules por si lo vuelves a usar */
+    /* Personalización del Slider en tonos azules por si acaso */
     .stSlider > div > div > div > div {
         background-color: #3B82F6 !important;
     }
@@ -61,6 +61,10 @@ client1.on_message = on_message
 
 # --- INTERFAZ ---
 st.title("🌀 Control de extractor de humo")
+
+# Descripción integrada (Opción 2)
+st.write("Panel de control remoto para el extractor de humo de la cocina inteligente (Smart Kitchen). Esta pestaña de la aplicación ofrece una solución interactiva de automatización donde, mediante botones dedicados de Encendido y Apagado, cualquier usuario puede intervenir el estado del sistema de ventilación instantáneamente y sin configuraciones complejas.")
+st.write("---")
 
 # Botones organizados en columnas para mejor estética
 col1, col2 = st.columns(2)
