@@ -1,4 +1,4 @@
- import streamlit as st
+import streamlit as st
 from openai import OpenAI
 
 st.set_page_config(page_title="Mi propio chat", page_icon="💬", layout="centered")
