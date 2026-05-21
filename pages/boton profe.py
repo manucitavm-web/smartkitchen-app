@@ -5,7 +5,7 @@ import json
 import platform
 
 # --- CONFIGURACIÓN ESTÉTICA (SÓLO VISUAL) ---
-st.set_page_config(page_title="MQTT Control Pink", page_icon="🌸")
+st.set_page_config(page_title="Control de extractor de humo", page_icon="🌸")
 
 st.markdown("""
     <style>
