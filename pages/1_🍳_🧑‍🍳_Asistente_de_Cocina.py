@@ -15,9 +15,16 @@ with st.sidebar:
 
     st.subheader("🤖 Personalidad")
 
+    # 🔥 CAMBIO AQUÍ: Establecemos la personalidad por defecto desde el código
     if "system_prompt" not in st.session_state:
-        st.session_state.system_prompt = ""
+        st.session_state.system_prompt = (
+            "Eres un chef profesional alegre, creativo y experto en optimizar "
+            "ingredientes. Tu objetivo es ayudar a los usuarios a crear recetas deliciosas "
+            "con lo que tengan en su nevera. Habla con entusiasmo, da tips de cocina "
+            "y usa emojis relacionados con alimentos."
+        )
 
+    # El área de texto cargará automáticamente la personalidad por defecto
     system_input = st.text_area(
         "System Prompt",
         value=st.session_state.system_prompt,
@@ -26,6 +33,7 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
+    # El usuario todavía puede cambiarla temporalmente en la interfaz si quiere
     if st.button("💾 Guardar personalidad", use_container_width=True):
         st.session_state.system_prompt = system_input
         st.success("¡Guardado!")
