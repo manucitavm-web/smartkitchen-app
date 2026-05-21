@@ -63,7 +63,7 @@ st.markdown("""
 # ===== HERO =====
 st.markdown("""
 <div class="titulo">
-    <h1>🍳 SmartKitchen</h1>
+    <h1>🥣 SmartKitchen</h1>
     <p>
         Disfruta de tu cocina inteligente a través de una gran experiencia interactiva y moderna 💙
     </p>
