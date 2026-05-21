@@ -15,7 +15,7 @@ st.markdown("""
     /* Títulos y textos en tonos fucsia */
     h1, h2, h3, p, span, label { color: #ff1493 !important; }
 
-    /* Estilo para TODOS los botones de Streamlit (ON, OFF, Enviar) */
+    /* Estilo para TODOS los botones de Streamlit (Encender, Apagar, Enviar) */
     div.stButton > button {
         background-color: #ff69b4 !important;
         color: white !important;
