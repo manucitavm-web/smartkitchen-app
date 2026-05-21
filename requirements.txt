@@ -4,3 +4,4 @@ paho-mqtt
 Pillow
 google-generativeai
 openai
+paho-mqtt== 1.6.1
