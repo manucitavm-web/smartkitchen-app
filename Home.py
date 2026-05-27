@@ -147,6 +147,7 @@ st.sidebar.markdown("""
 - Inicio
 - Asistente de Recetas
 - Monitor Inteligente
+- Control Extractor de Humo
 """)
 
 st.sidebar.markdown("---")
